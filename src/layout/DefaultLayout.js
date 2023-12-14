@@ -18,12 +18,6 @@ const DefaultLayout = () => {
     window.addEventListener('storage', () => {
         setValidSession(JSON.parse(localStorage.getItem('validSession')))
     })
-    useEffect(() => {
-        dispatch(requestThunk.getTicketCancelRequest())
-            .unwrap()
-            .then(() => {})
-            .catch(() => {})
-    }, [])
     if (validSession) {
         return (
             <div>

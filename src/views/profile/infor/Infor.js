@@ -36,7 +36,8 @@ import male from 'src/assets/images/avatars/male.svg'
 import female from 'src/assets/images/avatars/female.svg'
 import { CustomToast } from 'src/views/customToast/CustomToast'
 import CustomButton from 'src/views/customButton/CustomButton'
-
+import parse from 'date-fns/parse'
+import format from 'date-fns/format'
 const UserProfile = () => {
     const dispatch = useDispatch()
     const userRole = useSelector(selectUserRoleId)
@@ -130,10 +131,11 @@ const UserProfile = () => {
                 userRole > 1
                     ? userRole < 4
                         ? user.user.staff.beginWorkDate
-                        : user.user.driver.beginWorkDate
+                        : format(new Date(user.user.driver.beginWorkDate), 'dd/MM/yyyy')
                     : '09-09-2023',
             licenseNumber: userRole < 4 ? '' : user.user.driver.licenseNumber,
-            issueDate: userRole < 4 ? '' : user.user.driver.issueDate,
+            issueDate:
+                userRole < 4 ? '' : format(new Date(user.user.driver.issueDate), 'dd/MM/yyyy'),
             img:
                 userRole > 1
                     ? userRole < 4
@@ -217,10 +219,11 @@ const UserProfile = () => {
                 userRole > 1
                     ? userRole < 4
                         ? user.user.staff.beginWorkDate
-                        : user.user.driver.beginWorkDate
+                        : format(new Date(user.user.driver.beginWorkDate), 'dd/MM/yyyy')
                     : '09-09-2023',
             licenseNumber: userRole < 4 ? '' : user.user.driver.licenseNumber,
-            issueDate: userRole < 4 ? '' : user.user.driver.issueDate,
+            issueDate:
+                userRole < 4 ? '' : format(new Date(user.user.driver.issueDate), 'dd/MM/yyyy'),
             img:
                 userRole > 1
                     ? userRole < 4
@@ -257,7 +260,7 @@ const UserProfile = () => {
                             <CCardBody>
                                 <CForm ref={myform}>
                                     <p className="text-medium-emphasis">
-                                        Xem và cập nhật tài khoản nhân viên ủa bạn
+                                        Xem và cập nhật tài khoản tài xế ủa bạn
                                     </p>
                                     <CRow>
                                         <CCol md={4}>

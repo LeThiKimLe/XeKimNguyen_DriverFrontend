@@ -95,7 +95,6 @@ const ListTrip = () => {
             dispatch(ticketActions.clearTarget())
         }
     }, [isChanging])
-    console.log(sort)
     return (
         <>
             <CToaster ref={toaster} push={toast} placement="top-end" />

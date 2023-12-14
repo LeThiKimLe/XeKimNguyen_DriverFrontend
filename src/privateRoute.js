@@ -10,7 +10,7 @@ const ProtectedRoute = ({ redirectPath = '/login', children }) => {
     const navigate = useNavigate()
     const [valid, setValid] = useState(false)
     useEffect(() => {
-        if (!user || (user && (roleId < 2 || roleId > 3))) {
+        if (!user || (user && roleId !== 4)) {
             setValid(false)
             navigate(redirectPath, { replace: true })
         } else {

@@ -53,6 +53,10 @@ export const getDateAndTimeTicket = (ticket) => {
     )
 }
 
+export const getDateAndTimeSchedule = (schedule) => {
+    return schedule.departTime.slice(0, -3) + '-' + convertToDisplayDate(schedule.departDate)
+}
+
 export const getRouteJourney = (route) => {
     return route.departure.name + ' - ' + route.destination.name
 }
@@ -60,4 +64,15 @@ export const getRouteJourney = (route) => {
 export const getTripJourney = (trip) => {
     if (trip.turn === true) return trip.startStation.name + '-' + trip.endStation.name
     else return trip.endStation.name + '-' + trip.startStation.name
+}
+
+export const getTripStartStation = (trip) => {
+    if (trip)
+        if (trip.turn === 1) return trip.startStation.name
+        else return trip.endStation.name
+}
+export const getTripEndStation = (trip) => {
+    if (trip)
+        if (trip.turn === 1) return trip.endStation.name
+        else return trip.startStation.name
 }

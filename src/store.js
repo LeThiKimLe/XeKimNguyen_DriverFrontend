@@ -18,11 +18,12 @@ import tripReducer from './feature/trip/trip.slice'
 import staffReducer from './feature/staff/staff.slice'
 import scheduleReducer from './feature/schedule/schedule.slice'
 import statisticsReducer from './feature/statistics/statistics.slice'
+import driverReducer from './feature/driver/driver.slice'
 const rootPersistConfig = {
     key: 'root',
     storage,
     stateReconciler: autoMergeLevel2,
-    whitelist: ['slice'],
+    whitelist: ['slice', 'driver'],
 }
 
 const rootReducer = combineReducers({
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
     staff: staffReducer,
     schedule: scheduleReducer,
     statistics: statisticsReducer,
+    driver: driverReducer,
 })
 
 const persitedReducer = persistReducer(rootPersistConfig, rootReducer)
