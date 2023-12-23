@@ -218,7 +218,7 @@ const DriverTrip = () => {
                 })
                 .catch((error) => {})
         }
-    }, [listTrip.length])
+    }, [listTrip])
     return (
         <>
             {listTrip.length !== 0 && (
