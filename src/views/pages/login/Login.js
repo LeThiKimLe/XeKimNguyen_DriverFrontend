@@ -39,6 +39,7 @@ const Login = () => {
     const toaster = useRef()
     const loginForm = useRef()
     const userRole = useSelector(selectUserRoleId)
+    const [reload, setReload] = useState(false)
 
     const handleLogin = (e) => {
         if (loginForm.current.checkValidity()) {
@@ -53,9 +54,9 @@ const Login = () => {
                 .unwrap()
                 .then(() => {
                     dispatch(authActions.reset())
+                    setReload(true)
                 })
                 .catch((error) => {
-                    console.log(error)
                     addToast(() => CustomToast({ message: error, type: 'error' }))
                 })
         } else {
@@ -71,14 +72,17 @@ const Login = () => {
     }
 
     useEffect(() => {
-        if (!!userRole) {
-            if (userRole === 4) navigate('/')
-            else
-                addToast(() =>
-                    CustomToast({ message: 'Bạn không có quyền truy cập', type: 'error' }),
-                )
+        if (reload) {
+            if (!!userRole) {
+                if (userRole === 4) navigate('/')
+                else
+                    addToast(() =>
+                        CustomToast({ message: 'Bạn không có quyền truy cập', type: 'error' }),
+                    )
+            }
+            setReload(false)
         }
-    }, [userRole])
+    }, [userRole, reload])
     return (
         <>
             <CToaster ref={toaster} push={toast} placement="top-end" />
