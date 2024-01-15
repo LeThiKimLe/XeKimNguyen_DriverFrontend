@@ -38,7 +38,7 @@ const DetailTrip = React.lazy(() => import('./views/driverTrips/DetailTrip'))
 const routes = [
     { path: '/', exact: true, name: 'Home' },
     // { path: '/dashboard', name: 'Dashboard', element: Dashboard, protected: true },
-    { path: '/profile/infor', name: 'Thông tin tài xé', element: UserProfile },
+    { path: '/profile/infor', name: 'Thông tin tài xế', element: UserProfile },
     { path: '/profile/change-password', name: 'Đổi mật khẩu', element: ChangePassword },
     // { path: '/booking', name: 'Đặt vé', element: Booking },
     // { path: '/search-ticket', name: 'Tìm vé', element: SearchTicket },

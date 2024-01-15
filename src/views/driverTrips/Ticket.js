@@ -66,6 +66,7 @@ const Ticket = ({ seat, ticket, empty, updateList }) => {
                 <>
                     <CToaster ref={toaster} push={toast} placement="top-end" />
                     <CCard
+                        id={seat.name}
                         style={{ width: '250px', height: '280px' }}
                         className={`mb-3 border-${getItemColor()} border-3`}
                     >
@@ -122,6 +123,7 @@ const Ticket = ({ seat, ticket, empty, updateList }) => {
                             <CRow className="justify-content-center">
                                 <CCol xs="4" className="p-0 d-flex justify-content-center">
                                     <CButton
+                                        id={'check-in-' + seat.name}
                                         variant="outline"
                                         color="success"
                                         onClick={handleCheckIn}

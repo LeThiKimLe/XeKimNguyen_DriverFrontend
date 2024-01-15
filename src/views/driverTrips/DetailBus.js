@@ -525,7 +525,7 @@ const DetailBus = ({ visible, setVisible }) => {
                     <CModalHeader>
                         <b>{bus.licensePlate}</b>
                     </CModalHeader>
-                    <CModalBody className="tabStyle">
+                    <CModalBody id={bus.licensePlate} className="tabStyle">
                         <Tabs>
                             <TabList>
                                 <Tab>Thông tin cơ bản</Tab>

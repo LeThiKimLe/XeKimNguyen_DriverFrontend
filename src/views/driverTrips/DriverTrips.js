@@ -318,6 +318,7 @@ const ScheduleAsList = ({ listSchedule, time }) => {
                                     {schedule.bus &&
                                         schedule.bus.availability !== 'Đang cập nhật' && (
                                             <CIcon
+                                                id={'bus-detail-' + schedule.bus.licensePlate}
                                                 color="success"
                                                 icon={cilPencil}
                                                 role="button"
