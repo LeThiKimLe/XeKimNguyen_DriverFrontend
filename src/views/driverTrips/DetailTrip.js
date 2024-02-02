@@ -1,4 +1,4 @@
-import { CCardHeader, CFormLabel } from '@coreui/react'
+import { CButton, CCardHeader, CFormLabel, CModalFooter } from '@coreui/react'
 import React from 'react'
 import { getDateAndTimeSchedule } from 'src/utils/tripUtils'
 import { useSelector, useDispatch } from 'react-redux'
@@ -6,13 +6,32 @@ import { selectCurrentTrip } from 'src/feature/driver/driver.slice'
 import { selectDriverRoute } from 'src/feature/driver/driver.slice'
 import { selectListTicket } from 'src/feature/driver/driver.slice'
 import driverThunk from 'src/feature/driver/driver.service'
-import { useState, useEffect } from 'react'
-import { CCard, CRow, CCardSubtitle, CCardBody, CFormInput, CCol, CSpinner } from '@coreui/react'
+import { useState, useEffect, useRef } from 'react'
+import {
+    CCard,
+    CRow,
+    CCardSubtitle,
+    CCardBody,
+    CFormInput,
+    CCol,
+    CSpinner,
+    CModal,
+    CModalHeader,
+    CModalBody,
+} from '@coreui/react'
 import { Tab, TabPanel, Tabs, TabList } from 'react-tabs'
 import Ticket from './Ticket'
 import { convertToDisplayDate } from 'src/utils/convertUtils'
 import { getTripStartStation, getTripEndStation } from 'src/utils/tripUtils'
 import { selectCurrentSchedule, selectCurrentTime } from 'src/feature/driver/driver.slice'
+import seat_paid from 'src/assets/items/seat_paid.svg'
+import seat_empty from 'src/assets/items/seat_empty.svg'
+import seat_unpaid from 'src/assets/items/seat_unpaid.svg'
+import seat_checkedin from 'src/assets/items/seat_checkedin.svg'
+import { QrReader } from 'react-qr-reader'
+import MediaQuery from 'react-responsive'
+import CIcon from '@coreui/icons-react'
+import { cilQrCode } from '@coreui/icons'
 const DetailTrip = () => {
     const schedule = useSelector(selectCurrentSchedule)
     const currentTrip = useSelector(selectCurrentTrip)
@@ -22,6 +41,9 @@ const DetailTrip = () => {
     const dispatch = useDispatch()
     const listTicket = useSelector(selectListTicket)
     const [loading, setLoading] = useState(false)
+    const [showScan, setShowScan] = useState(false)
+    const qrReaderRef = useRef(null)
+    const ticketMap = useRef(null)
     const getSeatTicket = (seat) => {
         return listTicket.filter((tk) => tk.seat === seat.name && tk.state !== 'Đã hủy')[0]
     }
@@ -34,12 +56,54 @@ const DetailTrip = () => {
         else if (seatMap.colNo === 4) return '3'
         else return '2'
     }
-    const updateListTicket = () => {
-        dispatch(driverThunk.getScheduleInfor(schedule.id))
+    const updateListTicket = async () => {
+        await dispatch(driverThunk.getScheduleInfor(schedule.id))
             .unwrap()
             .then(() => {})
             .catch(() => {})
+        window.location.reload()
+        setTimeout(
+            () => ticketMap.current.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+            1000,
+        )
     }
+    const [scanResult, setScanResult] = useState('')
+    const [errorScan, setErrorScan] = useState('')
+    const [successMessage, setSuccessMessage] = useState('')
+    const [delayScan, setDelayScan] = useState(400)
+    const preQRValue = useRef('')
+    // Hàm xử lý khi quét thành công
+    const handleScan = async (data) => {
+        if (data?.text !== '' && data?.text !== preQRValue.current) {
+            preQRValue.current = data.text
+            //Check if ticket id valid
+            const ticket = schedule.tickets.filter((tk) => tk.id == data.text)
+            if (ticket.length === 0) {
+                setErrorScan('Vé không tồn tại hoặc không thuộc chuyến này')
+                return
+            } else {
+                if (ticket[0].checkedIn === true) {
+                    setErrorScan('Vé đã check in rồi')
+                    return
+                } else {
+                    await dispatch(driverThunk.checkInTicket(data.text))
+                        .unwrap()
+                        .then(async () => {
+                            setSuccessMessage('Check in thành công vé ' + ticket[0].seat)
+                            setErrorScan('')
+                            setScanResult('')
+                            setDelayScan(false)
+                            await updateListTicket()
+                            setTimeout(() => setShowScan(false), 1000)
+                        })
+                        .catch((error) => {
+                            setErrorScan(error.toString())
+                        })
+                }
+            }
+        }
+    }
+
     useEffect(() => {
         setLoading(true)
         dispatch(driverThunk.getScheduleInfor(schedule.id))
@@ -51,6 +115,12 @@ const DetailTrip = () => {
                 setLoading(false)
             })
     }, [])
+    useEffect(() => {
+        if (showScan === false) {
+            setErrorScan('')
+            setSuccessMessage('')
+        }
+    }, [showScan])
     return (
         <>
             {currentTrip && (
@@ -192,9 +262,9 @@ const DetailTrip = () => {
                     </CCardBody>
                 </CCard>
             )}
-            <CCard>
+            <CCard ref={ticketMap}>
                 {seatMap && !loading && (
-                    <CRow>
+                    <CRow className="justify-content-center py-2">
                         <div className={`tabStyle`}>
                             <Tabs>
                                 <TabList>
@@ -233,9 +303,11 @@ const DetailTrip = () => {
                                                     return filteredSeats.length > 0 ? (
                                                         filteredSeats.map((seat) => (
                                                             <CCol
+                                                                sm={2}
                                                                 md={getColWidth()}
                                                                 key={seat.name}
                                                                 className="d-flex justify-content-center"
+                                                                style={{ width: 'fit-content' }}
                                                             >
                                                                 <Ticket
                                                                     seat={seat}
@@ -247,8 +319,10 @@ const DetailTrip = () => {
                                                         ))
                                                     ) : (
                                                         <CCol
+                                                            sm={2}
                                                             md={getColWidth()}
                                                             key={`${floorNumber}-${rowNumber}-${colNumber}`}
+                                                            style={{ width: 'fit-content' }}
                                                         >
                                                             <Ticket empty={true} />
                                                         </CCol>
@@ -260,6 +334,76 @@ const DetailTrip = () => {
                                 ))}
                             </Tabs>
                         </div>
+                        <MediaQuery maxWidth={878}>
+                            <div className="d-flex justify-content-center my-3">
+                                <button
+                                    onClick={() => setTimeout(() => setShowScan(!showScan), 1000)}
+                                    className="p-2 d-flex align-items-center gap-1 rounded-2"
+                                >
+                                    <CIcon icon={cilQrCode}></CIcon>
+                                    <b>Quét mã vé</b>
+                                </button>
+                                {showScan && (
+                                    <>
+                                        <div
+                                            className={`itemContainer ${!showScan ? 'hidden' : ''}`}
+                                        >
+                                            <i>
+                                                <b>Quét mã QR trên vé</b>
+                                            </i>
+                                            <QrReader
+                                                onResult={async (result, error) => {
+                                                    if (!!result) {
+                                                        await handleScan(result)
+                                                    }
+                                                }}
+                                                style={{ width: '100%' }}
+                                            />
+                                            <i style={{ color: 'red' }}>
+                                                {errorScan !== '' ? errorScan : ''}
+                                            </i>
+                                            <i style={{ color: 'green' }}>
+                                                {successMessage !== '' ? successMessage : ''}
+                                            </i>
+                                            <br></br>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <CButton
+                                                    onClick={() => setShowScan(false)}
+                                                    variant="outline"
+                                                    color="primary"
+                                                >
+                                                    Đóng
+                                                </CButton>
+                                            </div>
+                                        </div>
+                                        <div className={`mask ${!showScan ? 'hidden' : ''}`} />
+                                    </>
+                                )}
+                            </div>
+                        </MediaQuery>
+                        <MediaQuery maxWidth={878}>
+                            <div className="py-2 border-top w-75 mt-3">
+                                <b>Chú thích</b>
+                                <CRow>
+                                    <CCol className="d-flex align-items-center gap-1">
+                                        <img src={seat_checkedin} alt="seat_checkedin" />
+                                        Đã lên xe
+                                    </CCol>
+                                    <CCol className="d-flex align-items-center gap-1">
+                                        <img src={seat_paid} alt="seat_paid" />
+                                        Đã thanh toán
+                                    </CCol>
+                                    <CCol className="d-flex align-items-center gap-1">
+                                        <img src={seat_unpaid} alt="seat_unpaid" />
+                                        Chưa thanh toán
+                                    </CCol>
+                                    <CCol className="d-flex align-items-center gap-1">
+                                        <img src={seat_empty} alt="seat_empty" />
+                                        Ghế trống
+                                    </CCol>
+                                </CRow>
+                            </div>
+                        </MediaQuery>
                     </CRow>
                 )}
                 {loading && (

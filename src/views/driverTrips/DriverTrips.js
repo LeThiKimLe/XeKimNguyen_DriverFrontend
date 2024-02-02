@@ -39,6 +39,8 @@ import { startOfWeek, endOfWeek, format } from 'date-fns'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { dayInWeek } from 'src/utils/constants'
+import MediaQuery from 'react-responsive'
+import { useMediaQuery } from 'react-responsive'
 const ScheduleWrap = ({ schedule }) => {
     const getScheduleColor = () => {
         if (schedule.tripInfor && schedule.tripInfor.turn === true) return 'success'
@@ -350,7 +352,8 @@ const DriverTrip = () => {
     const [currentDay, setCurrentDay] = useState(new Date())
     const [startDate, setStartDate] = useState(startOfWeek(currentDay, { weekStartsOn: 1 }))
     const [endDate, setEndDate] = useState(endOfWeek(currentDay, { weekStartsOn: 1 }))
-
+    const isBigScreen = useMediaQuery({ query: '(min-width: 878px)' })
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 878px)' })
     useEffect(() => {
         setCurrentList(
             turnList.filter(
@@ -451,33 +454,45 @@ const DriverTrip = () => {
     }, [listTrip])
     return (
         <>
-            <CRow className="my-3">
+            <CRow className="my-3 gap-3">
                 <CCol
+                    md={6}
+                    sm={12}
                     style={{ textAlign: 'right' }}
-                    className="d-flex align-items-center gap-1 customDatePicker"
+                    className={`d-flex gap-1 customDatePicker ${
+                        isTabletOrMobile ? 'flex-column' : 'align-items-center'
+                    }`}
                 >
-                    <b>
-                        <i>Ngày</i>
-                    </b>
-                    <DatePicker
-                        selected={currentDay}
-                        onChange={setCurrentDay}
-                        dateFormat="dd/MM/yyyy"
-                        showWeekNumbers
-                    />
-                    <b>
-                        <i>{` Tuần`}</i>
-                    </b>
-                    <CFormInput
-                        value={`${format(startDate, 'dd/MM/yyyy')} - ${format(
-                            endDate,
-                            'dd/MM/yyyy',
-                        )}`}
-                        disabled
-                        style={{ width: '250px', marrginLeft: '10px' }}
-                    ></CFormInput>
+                    <div className="d-flex align-items-center gap-1">
+                        <b>
+                            <i>Ngày</i>
+                        </b>
+                        <DatePicker
+                            selected={currentDay}
+                            onChange={setCurrentDay}
+                            dateFormat="dd/MM/yyyy"
+                            showWeekNumbers
+                        />
+                    </div>
+                    <div className="d-flex align-items-center gap-1">
+                        <b>
+                            <i>{` Tuần`}</i>
+                        </b>
+                        <CFormInput
+                            value={`${format(startDate, 'dd/MM/yyyy')} - ${format(
+                                endDate,
+                                'dd/MM/yyyy',
+                            )}`}
+                            disabled
+                            style={{ width: '250px', marrginLeft: '10px' }}
+                        ></CFormInput>
+                    </div>
                 </CCol>
-                <CCol style={{ textAlign: 'right' }}>
+                <CCol
+                    md={6}
+                    sm={12}
+                    style={isBigScreen ? { textAlign: 'right' } : { textAlign: 'center' }}
+                >
                     <CButtonGroup role="group" aria-label="Form option" color="info">
                         <CFormCheck
                             type="radio"
@@ -514,50 +529,52 @@ const DriverTrip = () => {
                             ></CFormInput>
                         </CCol>
                     </CRow>
-                    {listForm === 'list' ? (
-                        <CRow className="tabStyle">
-                            {listSchedule.length > 0 ? (
-                                <Tabs
-                                    className="mt-3"
-                                    selectedIndex={selectedTab}
-                                    onSelect={(index) => setSelectedTab(index)}
-                                >
-                                    <TabList>
-                                        <Tab>Đã thực hiện</Tab>
-                                        <Tab>Đang diễn ra</Tab>
-                                        <Tab>Sắp diễn ra</Tab>
-                                    </TabList>
-                                    <TabPanel>
-                                        <ScheduleAsList
-                                            listSchedule={getListSchedule('past')}
-                                            time="past"
-                                        ></ScheduleAsList>
-                                    </TabPanel>
-                                    <TabPanel>
-                                        <ScheduleAsList
-                                            listSchedule={getListSchedule('current')}
-                                            time="current"
-                                        ></ScheduleAsList>
-                                    </TabPanel>
-                                    <TabPanel>
-                                        <ScheduleAsList
-                                            listSchedule={getListSchedule('future')}
-                                            time="future"
-                                        ></ScheduleAsList>
-                                    </TabPanel>
-                                </Tabs>
-                            ) : (
-                                <div className="d-flex justify-content-center mt-3">
-                                    <h4>Bạn chưa có lịch trình hoạt động</h4>
-                                </div>
-                            )}
-                        </CRow>
-                    ) : (
-                        <ScheduleAsTable
-                            currentList={currentList}
-                            startDate={startDate}
-                        ></ScheduleAsTable>
-                    )}
+                    <div style={{ width: '100%', overflowX: 'auto' }}>
+                        {listForm === 'list' ? (
+                            <CRow className="tabStyle">
+                                {listSchedule.length > 0 ? (
+                                    <Tabs
+                                        className="mt-3"
+                                        selectedIndex={selectedTab}
+                                        onSelect={(index) => setSelectedTab(index)}
+                                    >
+                                        <TabList>
+                                            <Tab>Đã thực hiện</Tab>
+                                            <Tab>Đang diễn ra</Tab>
+                                            <Tab>Sắp diễn ra</Tab>
+                                        </TabList>
+                                        <TabPanel>
+                                            <ScheduleAsList
+                                                listSchedule={getListSchedule('past')}
+                                                time="past"
+                                            ></ScheduleAsList>
+                                        </TabPanel>
+                                        <TabPanel>
+                                            <ScheduleAsList
+                                                listSchedule={getListSchedule('current')}
+                                                time="current"
+                                            ></ScheduleAsList>
+                                        </TabPanel>
+                                        <TabPanel>
+                                            <ScheduleAsList
+                                                listSchedule={getListSchedule('future')}
+                                                time="future"
+                                            ></ScheduleAsList>
+                                        </TabPanel>
+                                    </Tabs>
+                                ) : (
+                                    <div className="d-flex justify-content-center mt-3">
+                                        <h4>Bạn chưa có lịch trình hoạt động</h4>
+                                    </div>
+                                )}
+                            </CRow>
+                        ) : (
+                            <ScheduleAsTable
+                                currentList={currentList}
+                                startDate={startDate}
+                            ></ScheduleAsTable>
+                        )}
+                    </div>
                 </>
             )}
             {loading && (
