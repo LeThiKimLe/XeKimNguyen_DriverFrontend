@@ -19,7 +19,7 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install && npm run install-qr-reader
 
       - name: Set CI environment variable
         run: echo "CI=false" >> $GITHUB_ENV
