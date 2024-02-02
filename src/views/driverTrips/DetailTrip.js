@@ -352,6 +352,7 @@ const DetailTrip = () => {
                                                 <b>Quét mã QR trên vé</b>
                                             </i>
                                             <QrReader
+                                                constraints={{ facingMode: 'environment' }}
                                                 onResult={async (result, error) => {
                                                     if (!!result) {
                                                         await handleScan(result)
