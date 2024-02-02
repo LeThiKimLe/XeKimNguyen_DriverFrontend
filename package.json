@@ -19,7 +19,8 @@
         "start": "react-scripts start --port 3001",
         "test": "react-scripts test",
         "test:cov": "npm test -- --coverage --watchAll=false",
-        "test:debug": "react-scripts --inspect-brk test --runInBand"
+        "test:debug": "react-scripts --inspect-brk test --runInBand",
+        "install-qr-reader": "npm install --force react-qr-reader"
     },
     "dependencies": {
         "@coreui/chartjs": "^3.1.2",
@@ -50,7 +51,6 @@
         "react-datepicker": "^4.21.0",
         "react-dom": "^18.2.0",
         "react-qr-code": "^2.0.12",
-        "react-qr-reader": "^3.0.0-beta-1",
         "react-redux": "^8.1.3",
         "react-responsive": "^9.0.2",
         "react-router-dom": "^6.14.0",
